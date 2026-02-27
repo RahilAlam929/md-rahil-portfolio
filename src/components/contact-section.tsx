@@ -53,7 +53,7 @@ export default function ContactSection() {
                 <input
                   id="name"
                   className="input-glass w-full px-4 py-2.5 text-sm placeholder:text-slate-500"
-                  placeholder="MD RAHIL"
+                  placeholder="....."
                 />
               </div>
               <div className="space-y-1.5">
@@ -67,7 +67,7 @@ export default function ContactSection() {
                   id="email"
                   type="email"
                   className="input-glass w-full px-4 py-2.5 text-sm placeholder:text-slate-500"
-                  placeholder="rahilalam0786s@gmail.com"
+                  placeholder="......"
                 />
               </div>
             </div>
@@ -97,7 +97,7 @@ export default function ContactSection() {
                 id="message"
                 rows={4}
                 className="textarea-glass w-full px-4 py-2.5 text-sm leading-relaxed placeholder:text-slate-500"
-                placeholder="Share a bit about what you’d like to build and any timelines."
+                placeholder="....."
               />
             </div>
 
