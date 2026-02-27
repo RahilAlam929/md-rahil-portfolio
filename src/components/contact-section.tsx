@@ -53,7 +53,7 @@ export default function ContactSection() {
                 <input
                   id="name"
                   className="input-glass w-full px-4 py-2.5 text-sm placeholder:text-slate-500"
-                  placeholder="Your name"
+                  placeholder="MD RAHIL"
                 />
               </div>
               <div className="space-y-1.5">
@@ -67,7 +67,7 @@ export default function ContactSection() {
                   id="email"
                   type="email"
                   className="input-glass w-full px-4 py-2.5 text-sm placeholder:text-slate-500"
-                  placeholder="you@example.com"
+                  placeholder="rahilalam0786s@gmail.com"
                 />
               </div>
             </div>
@@ -110,8 +110,7 @@ export default function ContactSection() {
                 <Send className="h-4 w-4" />
               </button>
               <p className="text-[11px] text-slate-500">
-                This form is visual only — wire it up to your backend or email
-                provider.
+              
               </p>
             </div>
           </motion.form>
@@ -177,7 +176,7 @@ export default function ContactSection() {
                   Instagram
                 </a>
                 <a
-                  href="https://github.com"
+                  href="https://github.com/RahilAlam929/"
                   target="_blank"
                   rel="noreferrer"
                   className="link-underline inline-flex items-center gap-1 text-xs text-slate-200 hover:text-slate-50"
