@@ -6,6 +6,8 @@ const navItems = [
   { label: "About", href: "#about" },
   { label: "Projects", href: "#projects" },
   { label: "Skills", href: "#skills" },
+  { label: "Events", href: "#events" },
+  { label: "Updates", href: "#updates" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -19,7 +21,7 @@ export default function TopNav() {
 
   return (
     <motion.header
-      className="nav-blur fixed inset-x-4 top-4 z-40 mx-auto flex max-w-5xl items-center justify-between rounded-2xl border border-slate-800/70 px-4 py-2.5 shadow-soft-glow sm:px-5"
+      className="nav-blur fixed inset-x-4 top-4 z-40 mx-auto flex max-w-5xl flex-col items-center justify-between gap-2 rounded-2xl border border-slate-800/70 px-4 py-2.5 shadow-soft-glow sm:flex-row sm:gap-0 sm:px-5"
       initial={{ y: -24, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
@@ -39,13 +41,13 @@ export default function TopNav() {
         </div>
       </div>
 
-      <nav className="hidden items-center gap-4 text-xs font-medium text-slate-300 sm:flex">
+      <nav className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 text-[10px] font-medium text-slate-300 sm:justify-end sm:gap-x-4 sm:gap-y-2 sm:text-xs">
         {navItems.map((item) => (
           <button
             key={item.href}
             type="button"
             onClick={() => handleClick(item.href)}
-            className="chip-soft px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-slate-200/85 transition hover:text-sky-300"
+            className="chip-soft whitespace-nowrap px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-slate-200/85 transition hover:text-sky-300 sm:px-3 sm:text-[11px] sm:tracking-[0.16em]"
           >
             {item.label}
           </button>

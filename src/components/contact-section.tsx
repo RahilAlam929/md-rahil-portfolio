@@ -1,12 +1,48 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail, Phone, Instagram, Linkedin, Github, Send } from "lucide-react";
-import { FormEvent } from "react";
+import { Mail, Phone, Instagram, Linkedin, Github, Send, Loader2 } from "lucide-react";
+import { FormEvent, useState } from "react";
+
+type SubmitStatus = "idle" | "loading" | "success" | "error";
 
 export default function ContactSection() {
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const [status, setStatus] = useState<SubmitStatus>("idle");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const payload = {
+      name: (formData.get("name") as string) ?? "",
+      email: (formData.get("email") as string) ?? "",
+      subject: (formData.get("subject") as string) ?? "",
+      message: (formData.get("message") as string) ?? "",
+    };
+
+    setStatus("loading");
+    setErrorMessage("");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setStatus("error");
+        setErrorMessage(data.error ?? "Something went wrong.");
+        return;
+      }
+      setStatus("success");
+      form.reset();
+    } catch {
+      setStatus("error");
+      setErrorMessage("Network error. Please try again.");
+    }
   };
 
   return (
@@ -52,6 +88,8 @@ export default function ContactSection() {
                 </label>
                 <input
                   id="name"
+                  name="name"
+                  required
                   className="input-glass w-full px-4 py-2.5 text-sm placeholder:text-slate-500"
                   placeholder="....."
                 />
@@ -65,7 +103,9 @@ export default function ContactSection() {
                 </label>
                 <input
                   id="email"
+                  name="email"
                   type="email"
+                  required
                   className="input-glass w-full px-4 py-2.5 text-sm placeholder:text-slate-500"
                   placeholder="......"
                 />
@@ -81,6 +121,7 @@ export default function ContactSection() {
               </label>
               <input
                 id="subject"
+                name="subject"
                 className="input-glass w-full px-4 py-2.5 text-sm placeholder:text-slate-500"
                 placeholder="Project idea, collaboration, robotics, etc."
               />
@@ -95,19 +136,39 @@ export default function ContactSection() {
               </label>
               <textarea
                 id="message"
+                name="message"
                 rows={4}
+                required
                 className="textarea-glass w-full px-4 py-2.5 text-sm leading-relaxed placeholder:text-slate-500"
                 placeholder="....."
               />
             </div>
 
+            {status === "success" && (
+              <p className="text-sm font-medium text-emerald-400">
+                Message sent. I&apos;ll get back to you soon.
+              </p>
+            )}
+            {status === "error" && errorMessage && (
+              <p className="text-sm font-medium text-red-400">{errorMessage}</p>
+            )}
             <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-sky-500 via-blue-500 to-fuchsia-500 px-5 py-2.5 text-sm font-semibold text-slate-50 shadow-soft-glow transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+                disabled={status === "loading"}
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-sky-500 via-blue-500 to-fuchsia-500 px-5 py-2.5 text-sm font-semibold text-slate-50 shadow-soft-glow transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:opacity-70 disabled:pointer-events-none"
               >
-                Send Message
-                <Send className="h-4 w-4" />
+                {status === "loading" ? (
+                  <>
+                    Sending...
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  </>
+                ) : (
+                  <>
+                    Send Message
+                    <Send className="h-4 w-4" />
+                  </>
+                )}
               </button>
               <p className="text-[11px] text-slate-500">
               
