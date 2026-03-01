@@ -1,112 +1,109 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { Calendar } from "lucide-react";
 
 type EventItem = {
   title: string;
-  date: string;
-  description: string;
-  track: string;
+  date?: string; // e.g. "2026-03-10" or "Mar 10, 2026"
+  location?: string;
+  description?: string;
+  link?: string;
 };
 
-const events: EventItem[] = [
-  {
-    title: "Robotics + Web Systems Meetup",
-    date: "2026 · Coming soon",
-    description:
-      "A hands-on session on building real-time dashboards for autonomous systems: telemetry, safety, and delightful UI.",
-    track: "Community",
-  },
-  {
-    title: "AI Control Loops Workshop",
-    date: "2026 · Planned",
-    description:
-      "Practical ML for robotics: sensor fusion concepts, evaluation, and how to surface insights inside product UIs.",
-    track: "Workshop",
-  },
-  {
-    title: "Portfolio Build Stream",
-    date: "2026 · Quarterly",
-    description:
-      "Live build notes from my lab: performance, animations, and the small UX details that make interfaces feel premium.",
-    track: "Build",
-  },
-];
+type EventsSectionProps = {
+  events?: EventItem[];
+};
 
-export default function EventsSection() {
+export default function EventsSection({ events = [] }: EventsSectionProps) {
+  const hasEvents = events.length > 0;
+
   return (
     <section
       id="events"
-      className="section-shell relative overflow-hidden px-5 py-7 sm:px-8 sm:py-9 md:px-10 md:py-10 lg:px-12"
+      className="section-shell relative overflow-hidden px-5 py-8 sm:px-8 sm:py-10 md:px-10 md:py-12 lg:px-12 lg:py-14"
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-fuchsia-500/15 via-transparent to-transparent blur-3xl" />
+      <div className="grid-bg pointer-events-none" aria-hidden />
 
-      <div className="relative space-y-6">
-        <div className="flex flex-col justify-between gap-3 md:flex-row md:items-end">
-          <div>
-            <h2 className="text-xs font-semibold uppercase tracking-[0.25em] text-sky-300">
-              Events
-            </h2>
-            <p className="mt-2 text-xl font-semibold text-slate-50 md:text-2xl">
-              Talks, workshops, and community builds.
-            </p>
-          </div>
-          <p className="max-w-md text-xs text-slate-400 md:text-[13px]">
-            A curated feed of sessions where I share robotics dashboards, AI
-            product thinking, and full stack engineering patterns.
-          </p>
-        </div>
+      <h2 className="mb-6 text-center text-lg font-semibold tracking-wide text-sky-200">
+        Events & Updates
+      </h2>
 
-        <div className="grid gap-4 md:grid-cols-3">
-          {events.map((item, index) => (
-            <motion.article
-              key={item.title}
-              className="group relative overflow-hidden rounded-2xl border border-slate-700/70 bg-slate-950/70 p-4 shadow-soft-glow"
-              initial={{ opacity: 0, y: 22 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.45 }}
-              transition={{
-                duration: 0.65,
-                delay: index * 0.06,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              whileHover={{
-                y: -4,
-                transition: { type: "spring", stiffness: 160, damping: 18 },
-              }}
-            >
-              <div className="pointer-events-none absolute -inset-x-10 -top-16 h-32 bg-gradient-to-b from-sky-500/20 via-transparent to-transparent opacity-0 blur-3xl transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="flex justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="relative w-full max-w-xl"
+        >
+          <div className="absolute -inset-6 rounded-[1.4rem] neon-ring pointer-events-none" />
 
-              <div className="relative space-y-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="text-[10px] font-mono uppercase tracking-[0.18em] text-slate-400">
-                      {item.track}
-                    </p>
-                    <h3 className="mt-1 text-sm font-semibold text-slate-50">
-                      {item.title}
-                    </h3>
-                  </div>
-                  <span className="badge-pill px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-slate-200">
-                    {item.date}
-                  </span>
-                </div>
+          <div className="glass-surface relative z-10 mx-4 rounded-[1.25rem] p-7 text-center neon-border float-anim fade-in">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-900/50 ring-1 ring-sky-500/20 shadow-soft-glow">
+              <Calendar className="h-8 w-8 text-sky-300" />
+            </div>
 
-                <p className="text-xs leading-relaxed text-slate-300/85 md:text-[13px]">
-                  {item.description}
+            {!hasEvents ? (
+              <>
+                <h3 className="mt-5 text-xl font-semibold text-slate-100">
+                  No Events Yet
+                </h3>
+                <p className="mt-3 text-sm text-slate-300">
+                  New events coming soon...
                 </p>
 
-                <div className="pt-1">
-                  <span className="chip-soft inline-flex px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-sky-200/90">
-                    Join soon
-                  </span>
-                </div>
-              </div>
-            </motion.article>
-          ))}
-        </div>
+                <button
+                  type="button"
+                  className="mt-5 inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-gradient-to-r from-sky-600/5 to-sky-700/5 px-4 py-2 text-sm font-medium text-sky-100 shadow-soft-glow hover:brightness-105 focus:outline-none"
+                >
+                  Stay Tuned
+                </button>
+              </>
+            ) : (
+              <>
+                <h3 className="mt-5 text-xl font-semibold text-slate-100">
+                  Upcoming
+                </h3>
+
+                <ul className="mt-4 space-y-3 text-left">
+                  {events.map((ev, idx) => (
+                    <li
+                      key={`${ev.title}-${idx}`}
+                      className="rounded-xl border border-slate-700/60 bg-slate-950/40 p-4"
+                    >
+                      <p className="text-sm font-semibold text-slate-100">
+                        {ev.title}
+                      </p>
+                      <p className="mt-1 text-[12px] text-slate-400">
+                        {ev.date ? ev.date : "Date TBA"}
+                        {ev.location ? ` • ${ev.location}` : ""}
+                      </p>
+                      {ev.description ? (
+                        <p className="mt-2 text-sm text-slate-300">
+                          {ev.description}
+                        </p>
+                      ) : null}
+
+                      {ev.link ? (
+                        <a
+                          href={ev.link}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-3 inline-flex text-sm font-medium text-sky-300 hover:text-sky-200"
+                        >
+                          View details →
+                        </a>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+
+            <div className="pointer-events-none absolute inset-0 -z-10 opacity-30 events-inner-grid" />
+          </div>
+        </motion.div>
       </div>
     </section>
   );
 }
-

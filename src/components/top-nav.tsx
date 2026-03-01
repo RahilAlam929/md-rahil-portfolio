@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const navItems = [
   { label: "About", href: "#about" },
@@ -12,49 +13,156 @@ const navItems = [
 ];
 
 export default function TopNav() {
-  const handleClick = (href: string) => {
-    const el = document.querySelector(href);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLElement | null>(null);
+
+  // close on outside click
+  useEffect(() => {
+    const handleOutside = (e: MouseEvent) => {
+      const el = containerRef.current;
+      if (!el) return;
+      if (open && !el.contains(e.target as Node)) setOpen(false);
+    };
+    window.addEventListener("mousedown", handleOutside);
+    return () => window.removeEventListener("mousedown", handleOutside);
+  }, [open]);
+
+  // close on Escape
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const scrollToHash = (href: string) => {
+    const el = document.querySelector(href) as HTMLElement | null;
+
+    // URL hash update
+    if (typeof window !== "undefined") {
+      window.history.replaceState(null, "", href);
     }
+
+    if (!el) return;
+
+    // navbar offset (adjust if needed)
+    const yOffset = -95;
+    const y = el.getBoundingClientRect().top + window.scrollY + yOffset;
+    window.scrollTo({ top: y, behavior: "smooth" });
+  };
+
+  const handleNavClick = (href: string) => {
+    // close menu first
+    setOpen(false);
+
+    // wait for menu close/DOM settle then scroll
+    setTimeout(() => scrollToHash(href), 60);
   };
 
   return (
     <motion.header
-      className="nav-blur fixed inset-x-4 top-4 z-40 mx-auto flex max-w-5xl flex-col items-center justify-between gap-2 rounded-2xl border border-slate-800/70 px-4 py-2.5 shadow-soft-glow sm:flex-row sm:gap-0 sm:px-5"
+      ref={containerRef}
+      className="nav-blur fixed inset-x-4 top-4 z-50 mx-auto max-w-5xl rounded-2xl border border-slate-800/70 shadow-soft-glow sm:inset-x-6"
       initial={{ y: -24, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      role="navigation"
+      aria-label="Main navigation"
     >
-      <div className="flex items-center gap-2">
-        <div className="relative h-7 w-7 rounded-full bg-sky-400/40 dot-pulse">
-          <div className="neon-ring absolute inset-1 rounded-full bg-slate-950/80" />
-          <div className="absolute inset-[6px] rounded-full bg-gradient-to-br from-sky-400 via-blue-500 to-fuchsia-500" />
+      <div className="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-5">
+        {/* Brand */}
+        <div className="flex items-center gap-2">
+          <div className="relative h-7 w-7 rounded-full bg-sky-400/40 dot-pulse">
+            <div className="neon-ring absolute inset-1 rounded-full bg-slate-950/80" />
+            <div className="absolute inset-[6px] rounded-full bg-gradient-to-br from-sky-400 via-blue-500 to-fuchsia-500" />
+          </div>
+
+          <div className="flex flex-col leading-none">
+            <span className="text-xs font-medium uppercase tracking-[0.18em] text-sky-300/80">
+              MD RAHIL
+            </span>
+            <span className="text-[11px] text-slate-400">
+              Full Stack Web Developer · Robotics · AI
+            </span>
+          </div>
         </div>
-        <div className="flex flex-col leading-none">
-          <span className="text-xs font-medium uppercase tracking-[0.18em] text-sky-300/80">
-            MD RAHIL
-          </span>
-          <span className="text-[11px] text-slate-400">
-            Full Stack Web Developer· Robotics · AI
-          </span>
-        </div>
+
+        {/* Desktop nav */}
+        <nav className="hidden items-center gap-4 text-xs font-medium text-slate-300 sm:flex">
+          {navItems.map((item) => (
+            <button
+              key={item.href}
+              type="button"
+              onClick={() => handleNavClick(item.href)}
+              className="chip-soft px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-slate-200/85 transition hover:text-sky-300"
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        {/* Mobile hamburger */}
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          className="sm:hidden relative inline-flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900/50 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+          aria-label={open ? "Close menu" : "Open menu"}
+          aria-expanded={open}
+          aria-controls="mobile-nav"
+        >
+          <div className="relative h-5 w-6">
+            <motion.span
+              animate={open ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className="absolute left-0 top-0 h-[2px] w-full rounded bg-slate-100"
+            />
+            <motion.span
+              animate={open ? { opacity: 0 } : { opacity: 1 }}
+              transition={{ duration: 0.2 }}
+              className="absolute left-0 top-2 h-[2px] w-full rounded bg-slate-100"
+            />
+            <motion.span
+              animate={open ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className="absolute left-0 top-4 h-[2px] w-full rounded bg-slate-100"
+            />
+          </div>
+        </button>
       </div>
 
-      <nav className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 text-[10px] font-medium text-slate-300 sm:justify-end sm:gap-x-4 sm:gap-y-2 sm:text-xs">
-        {navItems.map((item) => (
-          <button
-            key={item.href}
-            type="button"
-            onClick={() => handleClick(item.href)}
-            className="chip-soft whitespace-nowrap px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-slate-200/85 transition hover:text-sky-300 sm:px-3 sm:text-[11px] sm:tracking-[0.16em]"
+      {/* Mobile menu */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            id="mobile-nav"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.32, ease: [0.2, 0.8, 0.2, 1] }}
+            className="sm:hidden"
           >
-            {item.label}
-          </button>
-        ))}
-      </nav>
+            <div className="px-4 pb-4">
+              <div className="glass-surface w-full rounded-xl border border-slate-700/60 p-3">
+                <ul className="flex flex-col gap-1">
+                  {navItems.map((item) => (
+                    <li key={item.href}>
+                      <button
+                        type="button"
+                        onClick={() => handleNavClick(item.href)}
+                        className="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-100 hover:bg-slate-900/40 hover:text-sky-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                        style={{ WebkitTapHighlightColor: "transparent" }}
+                      >
+                        {item.label}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 }
-
-

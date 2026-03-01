@@ -17,9 +17,10 @@ export default function AboutSection() {
   return (
     <section
       id="about"
-      className="section-shell relative overflow-hidden px-5 py-7 sm:px-8 sm:py-9 md:px-10 md:py-10 lg:px-12"
+      className="section-shell scroll-mt-28 relative overflow-hidden px-5 py-7 sm:px-8 sm:py-9 md:px-10 md:py-10 lg:px-12"
     >
       <div className="pointer-events-none absolute inset-x-10 -top-24 h-32 bg-gradient-to-b from-sky-500/20 via-transparent to-transparent blur-3xl" />
+
       <div className="relative flex flex-col gap-6 md:flex-row md:items-start md:gap-10">
         <motion.div
           className="md:w-2/3"
@@ -31,9 +32,11 @@ export default function AboutSection() {
           <h2 className="text-xs font-semibold uppercase tracking-[0.25em] text-sky-300">
             About
           </h2>
+
           <p className="mt-2 text-xl font-semibold text-slate-50 md:text-2xl">
             Full stack engineering fused with robotics intelligence.
           </p>
+
           <p className="mt-3 text-sm leading-relaxed text-slate-300/90 md:text-[15px]">
             I&apos;m MD Rahil, a{" "}
             <span className="font-semibold text-sky-300">
@@ -44,10 +47,11 @@ export default function AboutSection() {
               Robotics Enthusiast
             </span>{" "}
             focused on building systems where digital interfaces control
-            physical behavior. From real‑time dashboards to autonomous robots, I
+            physical behavior. From real-time dashboards to autonomous robots, I
             love architecting solutions that are both technically precise and
             visually premium.
           </p>
+
           <p className="mt-3 text-sm leading-relaxed text-slate-300/85 md:text-[15px]">
             My work blends modern web stacks like{" "}
             <span className="font-semibold text-sky-200">Next.js</span> with{" "}
@@ -72,6 +76,7 @@ export default function AboutSection() {
             <p className="text-xs font-mono uppercase tracking-[0.2em] text-slate-400">
               Core Stack
             </p>
+
             <div className="mt-3 flex flex-wrap gap-2">
               {badges.map((badge) => (
                 <motion.span
@@ -92,6 +97,7 @@ export default function AboutSection() {
                 </p>
                 <p>Robotics dashboards, control systems, and full stack apps.</p>
               </div>
+
               <div className="space-y-1 rounded-xl border border-fuchsia-500/30 bg-slate-900/80 p-3">
                 <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-slate-400">
                   Mindset
@@ -105,5 +111,3 @@ export default function AboutSection() {
     </section>
   );
 }
-
-

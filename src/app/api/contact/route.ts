@@ -1,128 +1,71 @@
-import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
-const GENERIC_ERROR = "Failed to send message. Please try again.";
-const CONFIG_ERROR = "Server email is not configured. Please try again later.";
-
-function getEnvConfig(): {
-  user: string | null;
-  pass: string | null;
-  missing: string[];
-} {
-  const user = process.env.EMAIL_USER?.trim() || null;
-  const pass = (process.env.EMAIL_PASS?.trim() ?? "").replace(/\s/g, "") || null;
-  const missing: string[] = [];
-  if (!user) missing.push("EMAIL_USER");
-  if (!pass) missing.push("EMAIL_PASS");
-  return { user, pass, missing };
-}
-
-function createTransporter(user: string, pass: string) {
-  return nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: { user, pass },
-  });
-}
-
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const config = getEnvConfig();
-    if (!config.user || !config.pass) {
-      const isDev = process.env.NODE_ENV === "development";
-      const hint = isDev && config.missing.length
-        ? ` Set ${config.missing.join(" and ")} in .env.local (project root) and restart the dev server.`
-        : "";
-      return NextResponse.json(
-        {
-          success: false,
-          error: CONFIG_ERROR + (isDev ? hint : ""),
-        },
-        { status: 503 }
-      );
-    }
+    const body = await req.json();
+    const { name, email, subject, message } = body || {};
 
-    const body = await request.json().catch(() => ({}));
-    const name = typeof body.name === "string" ? body.name : "";
-    const email = typeof body.email === "string" ? body.email : "";
-    const subject = typeof body.subject === "string" ? body.subject : "";
-    const message = typeof body.message === "string" ? body.message : "";
-
-    if (!name.trim() || !email.trim() || !message.trim()) {
-      return NextResponse.json(
-        { success: false, error: "Name, email, and message are required." },
+    if (!name || !email || !message) {
+      return Response.json(
+        { ok: false, error: "Name, Email, Message required." },
         { status: 400 }
       );
     }
 
-    const transporter = createTransporter(config.user, config.pass);
-    const mailOptions = {
-      from: `"Portfolio Contact" <${config.user}>`,
-      to: config.user,
-      replyTo: email.trim(),
-      subject: subject.trim() ? `[Portfolio] ${subject.trim()}` : "[Portfolio] New message",
-      text: [
-        `Name: ${name.trim()}`,
-        `Email: ${email.trim()}`,
-        subject.trim() ? `Subject: ${subject.trim()}` : "",
-        "",
-        message.trim(),
-      ]
-        .filter(Boolean)
-        .join("\n"),
-      html: [
-        "<p><strong>Name:</strong> " + escapeHtml(name.trim()) + "</p>",
-        "<p><strong>Email:</strong> " + escapeHtml(email.trim()) + "</p>",
-        subject.trim()
-          ? "<p><strong>Subject:</strong> " + escapeHtml(subject.trim()) + "</p>"
-          : "",
-        "<p><strong>Message:</strong></p>",
-        "<pre style=\"white-space:pre-wrap;font-family:inherit;\">" +
-          escapeHtml(message.trim()) +
-          "</pre>",
-      ]
-        .filter(Boolean)
-        .join(""),
-    };
+    const gmailUser = process.env.GMAIL_USER;
+    const gmailPass = process.env.GMAIL_APP_PASSWORD;
+    const toEmail = process.env.CONTACT_TO_EMAIL;
 
-    await transporter.sendMail(mailOptions);
-
-    return NextResponse.json({
-      success: true,
-      message: "Message sent successfully.",
-    });
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    if (process.env.NODE_ENV === "development") {
-      console.error("[contact API] Send failed:", msg);
+    if (!gmailUser || !gmailPass || !toEmail) {
+      return Response.json(
+        { ok: false, error: "Server env missing." },
+        { status: 500 }
+      );
     }
-    const isAuthError =
-      /invalid login|authentication|username and password|535|credentials|invalid credentials|oauth/i.test(msg) ||
-      msg.includes("EMAIL_USER") ||
-      msg.includes("EMAIL_PASS");
-    const isConfig = isAuthError;
-    const devAuthHint =
-      process.env.NODE_ENV === "development" && isConfig
-        ? " Check that EMAIL_PASS in .env.local is your Gmail App Password (Google Account → Security → App passwords), not your normal password."
-        : "";
-    return NextResponse.json(
-      {
-        success: false,
-        error: (isConfig ? CONFIG_ERROR : GENERIC_ERROR) + devAuthHint,
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: gmailUser,
+        pass: gmailPass, // ✅ app password
       },
-      { status: isConfig ? 503 : 500 }
+    });
+
+    const safeSubject = subject?.trim() || "Portfolio Contact";
+
+    await transporter.sendMail({
+      from: `"Portfolio Contact" <${gmailUser}>`,
+      to: toEmail,
+      replyTo: email, // ✅ so you can reply directly to sender
+      subject: safeSubject,
+      text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
+      html: `
+        <h3>New Portfolio Contact</h3>
+        <p><b>Name:</b> ${escapeHtml(name)}</p>
+        <p><b>Email:</b> ${escapeHtml(email)}</p>
+        <p><b>Subject:</b> ${escapeHtml(safeSubject)}</p>
+        <p><b>Message:</b></p>
+        <pre style="white-space:pre-wrap;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;">${escapeHtml(
+          message
+        )}</pre>
+      `,
+    });
+
+    return Response.json({ ok: true });
+  } catch (err: any) {
+    return Response.json(
+      { ok: false, error: err?.message || "Failed to send." },
+      { status: 500 }
     );
   }
 }
 
-function escapeHtml(text: string): string {
-  const map: Record<string, string> = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;",
-  };
-  return text.replace(/[&<>"']/g, (c) => map[c] ?? c);
+// small helper to avoid HTML injection
+function escapeHtml(input: string) {
+  return String(input)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
