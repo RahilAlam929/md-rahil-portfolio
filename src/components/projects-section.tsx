@@ -45,7 +45,7 @@ export default function ProjectsSection() {
   return (
     <section
       id="projects"
-      className="section-shell relative overflow-hidden px-5 py-7 sm:px-8 sm:py-9 md:px-10 md:py-10 lg:px-12"
+      className="section-shell scroll-mt-28 relative overflow-hidden px-5 py-7 sm:px-8 sm:py-9 md:px-10 md:py-10 lg:px-12"
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-sky-500/15 via-transparent to-transparent blur-3xl" />
 
@@ -59,9 +59,7 @@ export default function ProjectsSection() {
               Featured builds from my robotics & full stack lab.
             </p>
           </div>
-          <p className="max-w-md text-xs text-slate-400 md:text-[13px]">
-            
-          </p>
+          <p className="max-w-md text-xs text-slate-400 md:text-[13px]"></p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -123,9 +121,7 @@ export default function ProjectsSection() {
                       <span>Live Demo</span>
                     </button>
                   </div>
-                  <span className="hidden text-[10px] text-slate-500 sm:inline">
-                    
-                  </span>
+                  <span className="hidden text-[10px] text-slate-500 sm:inline"></span>
                 </div>
               </div>
             </motion.article>
@@ -135,5 +131,3 @@ export default function ProjectsSection() {
     </section>
   );
 }
-
-

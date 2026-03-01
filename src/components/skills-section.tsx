@@ -38,7 +38,7 @@ export default function SkillsSection() {
   return (
     <section
       id="skills"
-      className="section-shell relative overflow-hidden px-5 py-7 sm:px-8 sm:py-9 md:px-10 md:py-10 lg:px-12"
+      className="section-shell scroll-mt-28 relative overflow-hidden px-5 py-7 sm:px-8 sm:py-9 md:px-10 md:py-10 lg:px-12"
     >
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-sky-500/10 via-transparent to-fuchsia-500/10 opacity-70 blur-3xl" />
 
@@ -107,5 +107,3 @@ export default function SkillsSection() {
     </section>
   );
 }
-
-

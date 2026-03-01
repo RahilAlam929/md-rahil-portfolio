@@ -16,48 +16,43 @@ export default function TopNav() {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLElement | null>(null);
 
-  // close on outside click
+  // ✅ Close on outside click (capture phase so it behaves stable on mobile)
   useEffect(() => {
-    const handleOutside = (e: MouseEvent) => {
+    const onPointerDown = (e: PointerEvent) => {
       const el = containerRef.current;
       if (!el) return;
       if (open && !el.contains(e.target as Node)) setOpen(false);
     };
-    window.addEventListener("mousedown", handleOutside);
-    return () => window.removeEventListener("mousedown", handleOutside);
+
+    window.addEventListener("pointerdown", onPointerDown, true);
+    return () => window.removeEventListener("pointerdown", onPointerDown, true);
   }, [open]);
 
-  // close on Escape
+  // ✅ close on ESC
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
+    const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
     };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  const scrollToHash = (href: string) => {
+  // ✅ smooth scroll with navbar offset
+  const scrollToId = (href: string) => {
     const el = document.querySelector(href) as HTMLElement | null;
-
-    // URL hash update
-    if (typeof window !== "undefined") {
-      window.history.replaceState(null, "", href);
-    }
-
     if (!el) return;
 
-    // navbar offset (adjust if needed)
     const yOffset = -95;
     const y = el.getBoundingClientRect().top + window.scrollY + yOffset;
+
+    window.history.replaceState(null, "", href);
     window.scrollTo({ top: y, behavior: "smooth" });
   };
 
+  // ✅ IMPORTANT: close menu first, then scroll (delay to allow AnimatePresence exit)
   const handleNavClick = (href: string) => {
-    // close menu first
     setOpen(false);
-
-    // wait for menu close/DOM settle then scroll
-    setTimeout(() => scrollToHash(href), 60);
+    setTimeout(() => scrollToId(href), 180);
   };
 
   return (
@@ -95,7 +90,7 @@ export default function TopNav() {
               key={item.href}
               type="button"
               onClick={() => handleNavClick(item.href)}
-              className="chip-soft px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-slate-200/85 transition hover:text-sky-300"
+              className="chip-soft px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-slate-200/85 transition hover:text-sky-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
             >
               {item.label}
             </button>
@@ -149,8 +144,11 @@ export default function TopNav() {
                     <li key={item.href}>
                       <button
                         type="button"
-                        onClick={() => handleNavClick(item.href)}
-                        className="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-100 hover:bg-slate-900/40 hover:text-sky-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                        onClick={(e) => {
+                          e.stopPropagation(); // ✅ prevents outside-click handler interference
+                          handleNavClick(item.href);
+                        }}
+                        className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-100 hover:bg-slate-900/40 hover:text-sky-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
                         style={{ WebkitTapHighlightColor: "transparent" }}
                       >
                         {item.label}
