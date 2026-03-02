@@ -1,8 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
-import { useCallback, useEffect, useId, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 
 const navItems = [
   { label: "About", href: "#about" },
@@ -11,80 +10,88 @@ const navItems = [
   { label: "Events", href: "#events" },
   { label: "Updates", href: "#updates" },
   { label: "Contact", href: "#contact" },
-] as const;
+];
 
-const itemVariants = {
-  closed: { opacity: 0, y: -8 },
+const itemVariants: Variants = {
+  closed: { opacity: 0, y: 10 },
   open: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: 0.05 * i, duration: 0.2, ease: [0.16, 1, 0.3, 1] },
+    transition: {
+      delay: i * 0.05,
+      duration: 0.3,
+      ease: "easeOut", // ✅ FIX: array -> string
+    },
   }),
-  exit: { opacity: 0, y: -8 },
 };
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const menuId = useId();
+  const containerRef = useRef<HTMLElement | null>(null);
 
+  // ✅ Close on outside click (capture phase so it behaves stable on mobile)
   useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+    const onPointerDown = (e: PointerEvent) => {
+      const el = containerRef.current;
+      if (!el) return;
+      if (open && !el.contains(e.target as Node)) setOpen(false);
+    };
+
+    window.addEventListener("pointerdown", onPointerDown, true);
+    return () => window.removeEventListener("pointerdown", onPointerDown, true);
+  }, [open]);
+
+  // ✅ close on ESC
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
-
-  const scrollTo = useCallback((href: string) => {
-    const el = document.querySelector(href);
+  // ✅ smooth scroll with navbar offset
+  const scrollToId = (href: string) => {
+    const el = document.querySelector(href) as HTMLElement | null;
     if (!el) return;
 
-    const reduceMotion =
-      typeof window !== "undefined" &&
-      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    const yOffset = -95;
+    const y = el.getBoundingClientRect().top + window.scrollY + yOffset;
 
-    el.scrollIntoView({
-      behavior: reduceMotion ? "auto" : "smooth",
-      block: "start",
-    });
-  }, []);
+    window.history.replaceState(null, "", href);
+    window.scrollTo({ top: y, behavior: "smooth" });
+  };
 
-  const handleLinkClick = (
-    event: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-    href: string
-  ) => {
-    event.preventDefault();
+  // ✅ close menu first, then scroll (delay to allow AnimatePresence exit)
+  const handleNavClick = (href: string) => {
     setOpen(false);
-    scrollTo(href);
+    setTimeout(() => scrollToId(href), 180);
   };
 
   return (
     <motion.header
-      className="nav-blur fixed inset-x-4 top-4 z-40 mx-auto w-[min(72rem,calc(100%-2rem))] rounded-2xl border border-slate-800/70 shadow-soft-glow"
+      ref={containerRef}
+      className="nav-blur fixed inset-x-4 top-4 z-50 mx-auto max-w-5xl rounded-2xl border border-slate-800/70 shadow-soft-glow sm:inset-x-6"
       initial={{ y: -24, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      role="navigation"
+      aria-label="Main navigation"
     >
       <div className="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-5">
-        <div className="flex min-w-0 items-center gap-2">
-          <div className="relative h-7 w-7 shrink-0 rounded-full bg-sky-400/40 dot-pulse">
+        {/* Brand */}
+        <div className="flex items-center gap-2">
+          <div className="relative h-7 w-7 rounded-full bg-sky-400/40 dot-pulse">
             <div className="neon-ring absolute inset-1 rounded-full bg-slate-950/80" />
             <div className="absolute inset-[6px] rounded-full bg-gradient-to-br from-sky-400 via-blue-500 to-fuchsia-500" />
           </div>
-          <div className="min-w-0 leading-none">
-            <span className="block truncate text-xs font-medium uppercase tracking-[0.18em] text-sky-300/80">
+
+          <div className="flex flex-col leading-none">
+            <span className="text-xs font-medium uppercase tracking-[0.18em] text-sky-300/80">
               MD RAHIL
             </span>
-            <span className="hidden truncate text-[11px] text-slate-400 sm:block">
-              Full Stack Web Developer· Robotics · AI
+            <span className="text-[11px] text-slate-400">
+              Full Stack Web Developer · Robotics · AI
             </span>
           </div>
         </div>
@@ -92,88 +99,85 @@ export default function Navbar() {
         {/* Desktop nav */}
         <nav className="hidden items-center gap-4 text-xs font-medium text-slate-300 sm:flex">
           {navItems.map((item) => (
-            <a
+            <button
               key={item.href}
-              href={item.href}
-              onClick={(event) => handleLinkClick(event, item.href)}
-              className="chip-soft px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-slate-200/85 transition hover:text-sky-300"
+              type="button"
+              onClick={() => handleNavClick(item.href)}
+              className="chip-soft px-3 py-1 text-[11px] uppercase tracking-[0.16em] text-slate-200/85 transition hover:text-sky-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
             >
               {item.label}
-            </a>
+            </button>
           ))}
         </nav>
 
-        {/* Mobile hamburger — icon animates to X when open */}
+        {/* Mobile hamburger */}
         <button
           type="button"
-          className="chip-soft relative inline-flex h-9 w-9 items-center justify-center text-slate-100 transition-colors hover:text-sky-300 sm:hidden"
+          onClick={() => setOpen((v) => !v)}
+          className="sm:hidden relative inline-flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900/50 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
-          aria-controls={menuId}
-          onClick={() => setOpen((prev) => !prev)}
+          aria-controls="mobile-nav"
         >
-          <span className="relative flex h-4 w-4 items-center justify-center">
-            <AnimatePresence mode="wait" initial={false}>
-              {open ? (
-                <motion.span
-                  key="close"
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className="absolute"
-                >
-                  <X className="h-4 w-4" />
-                </motion.span>
-              ) : (
-                <motion.span
-                  key="menu"
-                  initial={{ rotate: 90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className="absolute"
-                >
-                  <Menu className="h-4 w-4" />
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </span>
+          <div className="relative h-5 w-6">
+            <motion.span
+              animate={open ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className="absolute left-0 top-0 h-[2px] w-full rounded bg-slate-100"
+            />
+            <motion.span
+              animate={open ? { opacity: 0 } : { opacity: 1 }}
+              transition={{ duration: 0.2 }}
+              className="absolute left-0 top-2 h-[2px] w-full rounded bg-slate-100"
+            />
+            <motion.span
+              animate={open ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className="absolute left-0 top-4 h-[2px] w-full rounded bg-slate-100"
+            />
+          </div>
         </button>
       </div>
 
-      {/* Mobile menu — slides down smoothly */}
-      <AnimatePresence initial={false}>
-        {open ? (
-          <motion.nav
-            id={menuId}
-            className="border-t border-slate-800/70 px-3 pb-3 pt-2 sm:hidden"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            style={{ overflow: "hidden" }}
+      {/* Mobile menu */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            id="mobile-nav"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.32, ease: "easeOut" }}
+            className="sm:hidden"
           >
-            <div className="grid gap-1.5 text-[11px] font-medium text-slate-300">
-              {navItems.map((item, i) => (
-                <motion.a
-                  key={item.href}
-                  href={item.href}
-                  variants={itemVariants}
-                  initial="closed"
-                  animate="open"
-                  custom={i}
-                  onClick={(event) => handleLinkClick(event, item.href)}
-                  className="chip-soft block w-full px-4 py-2.5 text-left uppercase tracking-[0.14em] text-slate-200/90 transition-colors hover:text-sky-300 active:bg-slate-800/50"
-                >
-                  {item.label}
-                </motion.a>
-              ))}
+            <div className="px-4 pb-4">
+              <div className="glass-surface w-full rounded-xl border border-slate-700/60 p-3">
+                <ul className="flex flex-col gap-1">
+                  {navItems.map((item, i) => (
+                    <li key={item.href}>
+                      <motion.button
+                        type="button"
+                        variants={itemVariants}
+                        initial="closed"
+                        animate="open"
+                        custom={i}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleNavClick(item.href);
+                        }}
+                        className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-100 hover:bg-slate-900/40 hover:text-sky-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
+                        style={{ WebkitTapHighlightColor: "transparent" }}
+                      >
+                        {item.label}
+                      </motion.button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-          </motion.nav>
-        ) : null}
+          </motion.div>
+        )}
       </AnimatePresence>
     </motion.header>
   );
 }
-
