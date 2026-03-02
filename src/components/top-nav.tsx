@@ -16,7 +16,7 @@ export default function TopNav() {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLElement | null>(null);
 
-  // ✅ Close on outside click (capture phase so it behaves stable on mobile)
+  // ✅ Close on outside click
   useEffect(() => {
     const onPointerDown = (e: PointerEvent) => {
       const el = containerRef.current;
@@ -25,10 +25,11 @@ export default function TopNav() {
     };
 
     window.addEventListener("pointerdown", onPointerDown, true);
-    return () => window.removeEventListener("pointerdown", onPointerDown, true);
+    return () =>
+      window.removeEventListener("pointerdown", onPointerDown, true);
   }, [open]);
 
-  // ✅ close on ESC
+  // ✅ Close on ESC
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -37,7 +38,7 @@ export default function TopNav() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  // ✅ smooth scroll with navbar offset
+  // ✅ Smooth scroll
   const scrollToId = (href: string) => {
     const el = document.querySelector(href) as HTMLElement | null;
     if (!el) return;
@@ -49,7 +50,6 @@ export default function TopNav() {
     window.scrollTo({ top: y, behavior: "smooth" });
   };
 
-  // ✅ IMPORTANT: close menu first, then scroll (delay to allow AnimatePresence exit)
   const handleNavClick = (href: string) => {
     setOpen(false);
     setTimeout(() => scrollToId(href), 180);
@@ -61,11 +61,12 @@ export default function TopNav() {
       className="nav-blur fixed inset-x-4 top-4 z-50 mx-auto max-w-5xl rounded-2xl border border-slate-800/70 shadow-soft-glow sm:inset-x-6"
       initial={{ y: -24, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.6, ease: "easeOut" }}   
       role="navigation"
       aria-label="Main navigation"
     >
       <div className="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-5">
+
         {/* Brand */}
         <div className="flex items-center gap-2">
           <div className="relative h-7 w-7 rounded-full bg-sky-400/40 dot-pulse">
@@ -103,8 +104,6 @@ export default function TopNav() {
           onClick={() => setOpen((v) => !v)}
           className="sm:hidden relative inline-flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900/50 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
           aria-label={open ? "Close menu" : "Open menu"}
-          aria-expanded={open}
-          aria-controls="mobile-nav"
         >
           <div className="relative h-5 w-6">
             <motion.span
@@ -134,7 +133,7 @@ export default function TopNav() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.32, ease: [0.2, 0.8, 0.2, 1] }}
+            transition={{ duration: 0.32, ease: "easeOut" }}  
             className="sm:hidden"
           >
             <div className="px-4 pb-4">
@@ -145,7 +144,7 @@ export default function TopNav() {
                       <button
                         type="button"
                         onClick={(e) => {
-                          e.stopPropagation(); // ✅ prevents outside-click handler interference
+                          e.stopPropagation();
                           handleNavClick(item.href);
                         }}
                         className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-100 hover:bg-slate-900/40 hover:text-sky-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
