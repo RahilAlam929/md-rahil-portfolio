@@ -7,6 +7,7 @@ import { ArrowRight, UserPlus, X } from "lucide-react";
 
 export default function ChallengeRegisterPage() {
   const searchParams = useSearchParams();
+
   const [form, setForm] = useState({
     challengeType: "hackathon",
     name: "",
@@ -18,6 +19,10 @@ export default function ChallengeRegisterPage() {
     reason: "",
   });
 
+  const [loading, setLoading] = useState(false);
+  const [teamId, setTeamId] = useState("");
+  const [status, setStatus] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
+
   useEffect(() => {
     const type = searchParams.get("type");
     if (type === "hackathon" || type === "ideathon") {
@@ -25,12 +30,9 @@ export default function ChallengeRegisterPage() {
     }
   }, [searchParams]);
 
-  const [loading, setLoading] = useState(false);
-  const [teamId, setTeamId] = useState("");
-  const [status, setStatus] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
-
   const submit = async () => {
     setStatus(null);
+    setTeamId("");
 
     if (!form.name || !form.email || !form.teamName || !form.teamMembers) {
       setStatus({
@@ -45,21 +47,35 @@ export default function ChallengeRegisterPage() {
     try {
       const res = await fetch("/api/challenge-register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(form),
       });
 
       const data = await res.json();
+      console.log("REGISTER RESPONSE:", data);
 
       if (!res.ok || !data.ok) {
-        throw new Error(data.error || "Registration failed");
+        throw new Error(data.message || data.error || "Registration failed");
       }
 
       setTeamId(data.teamId || "");
       setStatus({
         type: "ok",
-        msg: "Your registration was successful. A confirmation email has been sent.",
+        msg: data.message || "Your registration was successful.",
       });
+
+      setForm((p) => ({
+        ...p,
+        name: "",
+        email: "",
+        college: "",
+        year: "",
+        teamName: "",
+        teamMembers: "",
+        reason: "",
+      }));
     } catch (err: any) {
       setStatus({
         type: "err",
@@ -112,6 +128,7 @@ export default function ChallengeRegisterPage() {
           />
 
           <input
+            type="email"
             className="input-glass w-full px-4 py-3"
             placeholder="Email *"
             value={form.email}

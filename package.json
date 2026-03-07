@@ -13,6 +13,7 @@
     "@google/model-viewer": "^4.1.0",
     "framer-motion": "^12.34.3",
     "lucide-react": "^0.575.0",
+    "mongodb": "^7.1.0",
     "next": "^16.1.6",
     "nodemailer": "^8.0.1",
     "react": "^19.2.4",

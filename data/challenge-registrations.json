@@ -1,12 +1,15 @@
 [
   {
     "id": "1772868410644",
-    "type": "register",
+    "challengeType": "register",
     "name": "MD RAHIL",
-    "email": "rmd037194md@gmaol.com",
-    "college": "Noida international university",
+    "email": "rahil@example.com",
+    "college": "Noida International University",
     "year": "2nd year",
-    "reason": "aaa",
+    "teamName": "",
+    "teamMembers": "",
+    "reason": "Interested in innovation",
+    "teamId": "",
     "createdAt": "2026-03-07T07:26:50.644Z"
   },
   {
@@ -14,11 +17,11 @@
     "challengeType": "ideathon",
     "name": "MD RAHIL",
     "email": "rahilalam0786m137@gmail.com",
-    "college": "NOIDA INTERNATION UNIVERSITY",
-    "year": "2ND TEAR",
+    "college": "NOIDA INTERNATIONAL UNIVERSITY",
+    "year": "2nd year",
     "teamName": "XRNIFITE",
     "teamMembers": "DD",
-    "reason": "DDEDD",
+    "reason": "Build innovative ideas",
     "teamId": "TEAM-FOQGOB",
     "createdAt": "2026-03-07T08:45:29.617Z"
   },
@@ -31,7 +34,7 @@
     "year": "",
     "teamName": "GACK",
     "teamMembers": "4",
-    "reason": "GII",
+    "reason": "AI project idea",
     "teamId": "TEAM-9Y6YDP",
     "createdAt": "2026-03-07T09:09:48.660Z"
   }

@@ -25,7 +25,10 @@ type RoadmapKey =
   | "cyber"
   | "robotics";
 
-const roadmaps: Record<RoadmapKey, { label: string; href: string; summary: string }> = {
+const roadmaps: Record<
+  RoadmapKey,
+  { label: string; href: string; summary: string }
+> = {
   frontend: {
     label: "Frontend Developer",
     href: "https://roadmap.sh/frontend",
@@ -138,12 +141,19 @@ const essentialResources = [
 function CardGrid({
   items,
 }: {
-  items: { title: string; desc: string; href: string; icon: any; tag?: string }[];
+  items: {
+    title: string;
+    desc: string;
+    href: string;
+    icon: any;
+    tag?: string;
+  }[];
 }) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {items.map((r, i) => {
         const Icon = r.icon;
+
         return (
           <motion.a
             key={r.title}
@@ -154,31 +164,34 @@ function CardGrid({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.03 }}
-            className="group relative rounded-2xl border border-slate-800/60 bg-slate-950/40 p-5 transition hover:border-sky-500/40 hover:bg-slate-950/60 cursor-pointer"
+            className="group relative rounded-2xl border border-slate-800/60 bg-slate-950/40 p-4 sm:p-5 transition hover:border-sky-500/40 hover:bg-slate-950/60"
           >
-            <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 blur-xl transition group-hover:opacity-100 bg-gradient-to-tr from-sky-500/10 via-blue-500/5 to-fuchsia-500/10" />
+            <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-tr from-sky-500/10 via-blue-500/5 to-fuchsia-500/10 opacity-0 blur-xl transition group-hover:opacity-100" />
 
-            <div className="relative flex items-start justify-between gap-3">
-              <div className="flex items-start gap-3">
-                <div className="rounded-xl border border-slate-800/70 bg-slate-950/60 p-2">
-                  <Icon className="h-5 w-5 text-sky-300/80" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base font-semibold text-slate-100 group-hover:text-sky-300 transition">
-                      {r.title}
-                    </h3>
-                    {r.tag && (
-                      <span className="rounded-full border border-slate-700/70 bg-slate-950/50 px-2 py-0.5 text-[10px] uppercase tracking-[0.16em] text-slate-300">
-                        {r.tag}
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-1 text-sm text-slate-400">{r.desc}</p>
-                </div>
+            <div className="relative flex items-start gap-3">
+              <div className="shrink-0 rounded-xl border border-slate-800/70 bg-slate-950/60 p-2">
+                <Icon className="h-5 w-5 text-sky-300/80" />
               </div>
 
-              <ArrowUpRight className="h-5 w-5 text-slate-400 transition group-hover:text-sky-300" />
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="text-sm font-semibold text-slate-100 transition group-hover:text-sky-300 sm:text-base break-words">
+                    {r.title}
+                  </h3>
+
+                  {r.tag && (
+                    <span className="rounded-full border border-slate-700/70 bg-slate-950/50 px-2 py-0.5 text-[10px] uppercase tracking-[0.16em] text-slate-300">
+                      {r.tag}
+                    </span>
+                  )}
+                </div>
+
+                <p className="mt-1 break-words text-xs leading-relaxed text-slate-400 sm:text-sm">
+                  {r.desc}
+                </p>
+              </div>
+
+              <ArrowUpRight className="h-5 w-5 shrink-0 text-slate-400 transition group-hover:text-sky-300" />
             </div>
 
             <div className="relative mt-5 text-xs uppercase tracking-[0.18em] text-slate-500">
@@ -449,8 +462,12 @@ const learningPacks: Record<
 };
 
 export default function ResourcesSection() {
-  const [selectedRoadmap, setSelectedRoadmap] = useState<RoadmapKey>("frontend");
-  const roadmap = useMemo(() => roadmaps[selectedRoadmap], [selectedRoadmap]);
+  const [selectedRoadmap, setSelectedRoadmap] =
+    useState<RoadmapKey>("frontend");
+  const roadmap = useMemo(
+    () => roadmaps[selectedRoadmap],
+    [selectedRoadmap]
+  );
 
   const [learnKey, setLearnKey] = useState<LearnKey>("web");
   const pack = useMemo(() => learningPacks[learnKey], [learnKey]);
@@ -458,12 +475,15 @@ export default function ResourcesSection() {
   return (
     <section
       id="resources"
-      className="section-shell mx-auto w-full max-w-6xl px-5 py-10 md:px-10 lg:px-12"
+      className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-10"
     >
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-sky-300">Builder Toolkit & Roadmaps</h2>
-        <p className="mt-1 text-sm text-slate-400">
-          Career roadmaps + essentials + free courses/certifications in one place.
+        <h2 className="text-lg font-semibold text-sky-300 sm:text-xl">
+          Builder Toolkit & Roadmaps
+        </h2>
+        <p className="mt-1 text-sm leading-relaxed text-slate-400">
+          Career roadmaps + essentials + free courses/certifications in one
+          place.
         </p>
       </div>
 
@@ -472,28 +492,35 @@ export default function ResourcesSection() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.45, ease: "easeOut" }}
-        className="relative overflow-hidden rounded-3xl border border-slate-800/60 bg-slate-950/35 p-6 sm:p-7"
+        className="relative overflow-hidden rounded-3xl border border-slate-800/60 bg-slate-950/35 p-5 sm:p-6 md:p-7"
       >
         <div className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-sky-500/10 blur-3xl" />
         <div className="pointer-events-none absolute -right-24 -bottom-24 h-64 w-64 rounded-full bg-fuchsia-500/10 blur-3xl" />
 
-        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
+        <div className="relative flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-slate-700/70 bg-slate-950/50 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-sky-300/80">
               Roadmap Hub
             </div>
-            <h3 className="mt-3 text-lg font-semibold text-slate-100">Choose a career path</h3>
-            <p className="mt-2 text-sm text-slate-400">{roadmap.summary}</p>
+            <h3 className="mt-3 text-base font-semibold text-slate-100 sm:text-lg">
+              Choose a career path
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-slate-400">
+              {roadmap.summary}
+            </p>
           </div>
 
-          <div className="flex flex-col gap-2 sm:items-end">
+          <div className="flex w-full flex-col gap-2 md:w-auto md:items-end">
             <label className="text-xs uppercase tracking-[0.16em] text-slate-500">
               Select roadmap
             </label>
+
             <select
               value={selectedRoadmap}
-              onChange={(e) => setSelectedRoadmap(e.target.value as RoadmapKey)}
-              className="w-full rounded-xl border border-slate-800/70 bg-slate-950/50 px-4 py-2 text-sm text-slate-100 outline-none focus:border-sky-500/60 sm:w-[340px]"
+              onChange={(e) =>
+                setSelectedRoadmap(e.target.value as RoadmapKey)
+              }
+              className="w-full rounded-xl border border-slate-800/70 bg-slate-950/50 px-4 py-3 text-sm text-slate-100 outline-none focus:border-sky-500/60 md:w-[340px]"
             >
               {Object.entries(roadmaps).map(([key, value]) => (
                 <option key={key} value={key}>
@@ -506,7 +533,7 @@ export default function ResourcesSection() {
               href={roadmap.href}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-sky-500/25 via-blue-500/15 to-fuchsia-500/20 px-4 py-2 text-sm font-semibold text-slate-100 hover:brightness-110"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-sky-500/25 via-blue-500/15 to-fuchsia-500/20 px-4 py-3 text-sm font-semibold text-slate-100 hover:brightness-110 md:w-auto"
             >
               Open Full Roadmap <ArrowUpRight className="h-4 w-4" />
             </a>
@@ -516,11 +543,14 @@ export default function ResourcesSection() {
 
       <div className="mt-8">
         <div className="mb-4">
-          <h3 className="text-lg font-semibold text-slate-100">Essentials (Linux + Git + Deploy)</h3>
-          <p className="mt-1 text-sm text-slate-400">
+          <h3 className="text-base font-semibold text-slate-100 sm:text-lg">
+            Essentials (Linux + Git + Deploy)
+          </h3>
+          <p className="mt-1 text-sm leading-relaxed text-slate-400">
             Must-have resources for every beginner developer.
           </p>
         </div>
+
         <CardGrid items={essentialResources} />
       </div>
 
@@ -529,30 +559,32 @@ export default function ResourcesSection() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.45, ease: "easeOut" }}
-        className="relative mt-10 overflow-hidden rounded-3xl border border-slate-800/60 bg-slate-950/35 p-6 sm:p-7"
+        className="relative mt-10 overflow-hidden rounded-3xl border border-slate-800/60 bg-slate-950/35 p-5 sm:p-6 md:p-7"
       >
         <div className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-emerald-500/8 blur-3xl" />
         <div className="pointer-events-none absolute -right-24 -bottom-24 h-64 w-64 rounded-full bg-fuchsia-500/8 blur-3xl" />
 
-        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
+        <div className="relative flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-slate-700/70 bg-slate-950/50 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-emerald-300/80">
               Free Courses & Certifications
             </div>
-            <h3 className="mt-3 text-lg font-semibold text-slate-100">
+            <h3 className="mt-3 text-base font-semibold text-slate-100 sm:text-lg">
               Pick a category and start learning
             </h3>
-            <p className="mt-2 text-sm text-slate-400">{pack.summary}</p>
+            <p className="mt-2 text-sm leading-relaxed text-slate-400">
+              {pack.summary}
+            </p>
           </div>
 
-          <div className="flex flex-col gap-2 sm:items-end">
+          <div className="flex w-full flex-col gap-2 md:w-auto md:items-end">
             <label className="text-xs uppercase tracking-[0.16em] text-slate-500">
               Select category
             </label>
             <select
               value={learnKey}
               onChange={(e) => setLearnKey(e.target.value as LearnKey)}
-              className="w-full rounded-xl border border-slate-800/70 bg-slate-950/50 px-4 py-2 text-sm text-slate-100 outline-none focus:border-emerald-400/60 sm:w-[340px]"
+              className="w-full rounded-xl border border-slate-800/70 bg-slate-950/50 px-4 py-3 text-sm text-slate-100 outline-none focus:border-emerald-400/60 md:w-[340px]"
             >
               {Object.entries(learningPacks).map(([k, v]) => (
                 <option key={k} value={k}>

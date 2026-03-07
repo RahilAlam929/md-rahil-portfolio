@@ -35,7 +35,10 @@ export default function ChallengeSubmitPage() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [fetchingTeam, setFetchingTeam] = useState(false);
-  const [status, setStatus] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
+  const [status, setStatus] = useState<{
+    type: "ok" | "err";
+    msg: string;
+  } | null>(null);
 
   useEffect(() => {
     const type = searchParams.get("type");
@@ -57,8 +60,11 @@ export default function ChallengeSubmitPage() {
 
     try {
       const res = await fetch(
-        `/api/challenge-team?teamId=${encodeURIComponent(form.teamId.trim().toUpperCase())}`
+        `/api/challenge-team?teamId=${encodeURIComponent(
+          form.teamId.trim().toUpperCase()
+        )}`
       );
+
       const data = await res.json();
 
       if (!res.ok || !data.ok) {
@@ -67,19 +73,22 @@ export default function ChallengeSubmitPage() {
 
       setForm((prev) => ({
         ...prev,
-        teamId: data.team.teamId,
-        challengeType: data.team.challengeType,
+        teamId: data.team.teamId || "",
+        challengeType: data.team.challengeType || "",
         name: data.team.name || "",
         email: data.team.email || "",
       }));
 
       setTeamInfo({
-        challengeType: data.team.challengeType,
-        teamName: data.team.teamName,
-        teamMembers: data.team.teamMembers,
+        challengeType: data.team.challengeType || "",
+        teamName: data.team.teamName || "",
+        teamMembers: data.team.teamMembers || "",
       });
 
-      setStatus({ type: "ok", msg: "Team verified successfully." });
+      setStatus({
+        type: "ok",
+        msg: "Team verified successfully.",
+      });
     } catch (err: any) {
       setStatus({
         type: "err",
@@ -96,6 +105,39 @@ export default function ChallengeSubmitPage() {
 
   const submit = async () => {
     setStatus(null);
+
+    if (!isVerified) {
+      setStatus({
+        type: "err",
+        msg: "Please verify your Team ID first.",
+      });
+      return;
+    }
+
+    if (!form.teamId || !form.name || !form.email) {
+      setStatus({
+        type: "err",
+        msg: "Team details are missing. Please verify Team ID again.",
+      });
+      return;
+    }
+
+    if (isHackathon && !form.projectLink.trim()) {
+      setStatus({
+        type: "err",
+        msg: "Live Project Link is required for hackathon submission.",
+      });
+      return;
+    }
+
+    if (isIdeathon && !form.note.trim() && !file) {
+      setStatus({
+        type: "err",
+        msg: "Please add solution details or upload a file for ideathon submission.",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -107,7 +149,10 @@ export default function ChallengeSubmitPage() {
       body.append("projectLink", form.projectLink);
       body.append("githubLink", form.githubLink);
       body.append("note", form.note);
-      if (file) body.append("attachment", file);
+
+      if (file) {
+        body.append("attachment", file);
+      }
 
       const res = await fetch("/api/challenge-submit", {
         method: "POST",
@@ -122,7 +167,7 @@ export default function ChallengeSubmitPage() {
 
       setStatus({
         type: "ok",
-        msg: `Submission successful. Team ID ${data.teamId} verified.`,
+        msg: data.message || "Submission successful.",
       });
 
       setForm({
@@ -134,6 +179,7 @@ export default function ChallengeSubmitPage() {
         githubLink: "",
         note: "",
       });
+
       setTeamInfo(null);
       setFile(null);
     } catch (err: any) {
@@ -179,6 +225,7 @@ export default function ChallengeSubmitPage() {
               <ShieldCheck className="h-4 w-4" />
               <span className="text-sm font-semibold">Team Verification Required</span>
             </div>
+
             <p className="mt-2 text-sm text-slate-300">
               Enter the Team ID you received during registration.
             </p>
@@ -190,7 +237,10 @@ export default function ChallengeSubmitPage() {
               placeholder="Team ID * (e.g. TEAM-AB12CD)"
               value={form.teamId}
               onChange={(e) =>
-                setForm((p) => ({ ...p, teamId: e.target.value.toUpperCase() }))
+                setForm((p) => ({
+                  ...p,
+                  teamId: e.target.value.toUpperCase(),
+                }))
               }
             />
 
@@ -206,7 +256,11 @@ export default function ChallengeSubmitPage() {
           </div>
 
           {status && (
-            <p className={`text-sm ${status.type === "ok" ? "text-emerald-300" : "text-rose-300"}`}>
+            <p
+              className={`text-sm ${
+                status.type === "ok" ? "text-emerald-300" : "text-rose-300"
+              }`}
+            >
               {status.msg}
             </p>
           )}
@@ -214,9 +268,15 @@ export default function ChallengeSubmitPage() {
           {isVerified && (
             <>
               <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 text-sm text-slate-200">
-                <div><strong>Challenge Type:</strong> {teamInfo.challengeType}</div>
-                <div><strong>Team Name:</strong> {teamInfo.teamName}</div>
-                <div><strong>Total Members:</strong> {teamInfo.teamMembers}</div>
+                <div>
+                  <strong>Challenge Type:</strong> {teamInfo.challengeType}
+                </div>
+                <div>
+                  <strong>Team Name:</strong> {teamInfo.teamName}
+                </div>
+                <div>
+                  <strong>Total Members:</strong> {teamInfo.teamMembers}
+                </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
@@ -239,20 +299,24 @@ export default function ChallengeSubmitPage() {
                   <div className="relative">
                     <LinkIcon className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
                     <input
-                      className="input-glass w-full pl-11 pr-4 py-3"
+                      className="input-glass w-full py-3 pl-11 pr-4"
                       placeholder="Live Project Link *"
                       value={form.projectLink}
-                      onChange={(e) => setForm((p) => ({ ...p, projectLink: e.target.value }))}
+                      onChange={(e) =>
+                        setForm((p) => ({ ...p, projectLink: e.target.value }))
+                      }
                     />
                   </div>
 
                   <div className="relative">
                     <Github className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
                     <input
-                      className="input-glass w-full pl-11 pr-4 py-3"
+                      className="input-glass w-full py-3 pl-11 pr-4"
                       placeholder="GitHub Repo Link"
                       value={form.githubLink}
-                      onChange={(e) => setForm((p) => ({ ...p, githubLink: e.target.value }))}
+                      onChange={(e) =>
+                        setForm((p) => ({ ...p, githubLink: e.target.value }))
+                      }
                     />
                   </div>
                 </>
@@ -267,7 +331,9 @@ export default function ChallengeSubmitPage() {
                     : "Short note about your approach / features"
                 }
                 value={form.note}
-                onChange={(e) => setForm((p) => ({ ...p, note: e.target.value }))}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, note: e.target.value }))
+                }
               />
 
               <label className="block cursor-pointer rounded-2xl border border-dashed border-slate-700/70 bg-slate-950/40 p-4">
@@ -278,7 +344,9 @@ export default function ChallengeSubmitPage() {
                       Upload PDF / PPT / PPTX
                     </div>
                     <div className="text-xs text-slate-500">
-                      {isIdeathon ? "Solution presentation" : "Optional explanation file"}
+                      {isIdeathon
+                        ? "Solution presentation"
+                        : "Optional explanation file"}
                     </div>
                   </div>
                 </div>
@@ -303,7 +371,11 @@ export default function ChallengeSubmitPage() {
                 disabled={loading}
                 className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-gradient-to-r from-sky-500 via-blue-500 to-fuchsia-500 px-6 py-3 text-sm font-semibold text-white shadow-soft-glow transition hover:brightness-110 disabled:opacity-60"
               >
-                {loading ? "Submitting..." : isIdeathon ? "Submit Solution" : "Submit Project"}
+                {loading
+                  ? "Submitting..."
+                  : isIdeathon
+                  ? "Submit Solution"
+                  : "Submit Project"}
                 <ArrowRight className="h-4 w-4" />
               </button>
             </>
