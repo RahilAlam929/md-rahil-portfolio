@@ -1,103 +1,71 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Bot, Sparkles, Radio, Mic, Cpu } from "lucide-react";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Sparkles, Radio, Trophy, Volume2 } from "lucide-react";
 
 const ModelViewer = "model-viewer" as any;
 
 export default function RobotWelcome() {
   const [mounted, setMounted] = useState(false);
-  const [spoken, setSpoken] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [typedText, setTypedText] = useState("");
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-
-  const fullText = useMemo(
-    () => "Welcome to Rahil Portfolio",
-    []
-  );
 
   useEffect(() => {
     setMounted(true);
-  }, []);
 
-  useEffect(() => {
-    let i = 0;
-    const timer = setInterval(() => {
-      i++;
-      setTypedText(fullText.slice(0, i));
-      if (i >= fullText.length) clearInterval(timer);
-    }, 55);
-
-    return () => clearInterval(timer);
-  }, [fullText]);
-
-  useEffect(() => {
-    if (!mounted) return;
-    if (!("speechSynthesis" in window)) return;
-
-    window.speechSynthesis.getVoices();
-    window.speechSynthesis.onvoiceschanged = () => {
+    if ("speechSynthesis" in window) {
       window.speechSynthesis.getVoices();
+
+      const handleVoices = () => {
+        window.speechSynthesis.getVoices();
+      };
+
+      window.speechSynthesis.onvoiceschanged = handleVoices;
+    }
+
+    return () => {
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
     };
-  }, [mounted]);
+  }, []);
 
   const speakWelcome = () => {
     try {
-      if (spoken) return;
       if (!("speechSynthesis" in window)) return;
 
-      const voices = window.speechSynthesis.getVoices();
-      const chosenVoice =
-        voices.find((x) => x.name.includes("Google UK English Female")) ||
-        voices.find((x) => x.lang === "en-IN") ||
-        voices.find((x) => x.lang?.startsWith("en")) ||
-        voices[0];
+      const synth = window.speechSynthesis;
+      const voices = synth.getVoices();
+
+      const selectedVoice =
+        voices.find((v) => v.name.includes("Google UK English Female")) ||
+        voices.find((v) => v.lang === "en-IN") ||
+        voices.find((v) => v.lang?.startsWith("en")) ||
+        null;
 
       const utterance = new SpeechSynthesisUtterance(
         "Hello, welcome to Rahil Portfolio."
       );
 
-      if (chosenVoice) utterance.voice = chosenVoice;
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
+
       utterance.lang = "en-IN";
       utterance.rate = 0.95;
-      utterance.pitch = 1.02;
+      utterance.pitch = 1.05;
       utterance.volume = 1;
 
       utterance.onstart = () => setIsSpeaking(true);
       utterance.onend = () => setIsSpeaking(false);
       utterance.onerror = () => setIsSpeaking(false);
 
-      utteranceRef.current = utterance;
-
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
-      setSpoken(true);
+      synth.cancel();
+      synth.speak(utterance);
     } catch {
       setIsSpeaking(false);
     }
   };
-
-  useEffect(() => {
-    const handleFirstInteraction = () => {
-      speakWelcome();
-      window.removeEventListener("click", handleFirstInteraction);
-      window.removeEventListener("keydown", handleFirstInteraction);
-      window.removeEventListener("touchstart", handleFirstInteraction);
-    };
-
-    window.addEventListener("click", handleFirstInteraction);
-    window.addEventListener("keydown", handleFirstInteraction);
-    window.addEventListener("touchstart", handleFirstInteraction);
-
-    return () => {
-      window.removeEventListener("click", handleFirstInteraction);
-      window.removeEventListener("keydown", handleFirstInteraction);
-      window.removeEventListener("touchstart", handleFirstInteraction);
-      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-    };
-  }, [spoken]);
 
   return (
     <section
@@ -116,30 +84,12 @@ export default function RobotWelcome() {
           </div>
 
           <h1 className="mt-4 text-3xl font-semibold text-slate-100 md:text-5xl">
-            <span className="gradient-text">{typedText}</span>
-            <span className="typing-cursor" />
+            <span className="gradient-text">Welcome to Rahil Portfolio</span>
           </h1>
 
           <p className="mt-3 text-sm text-slate-400 md:text-base">
             Explore projects, experiments, and BuildQuest challenge arena.
           </p>
-
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-slate-800/70 bg-slate-950/50 px-4 py-2 text-xs uppercase tracking-[0.16em] text-slate-400">
-              <Bot className="h-4 w-4 text-sky-300" />
-              AI Robot Active
-            </div>
-
-            <div className="inline-flex items-center gap-2 rounded-full border border-slate-800/70 bg-slate-950/50 px-4 py-2 text-xs uppercase tracking-[0.16em] text-slate-400">
-              <Cpu className="h-4 w-4 text-fuchsia-300" />
-              3D Interface Loaded
-            </div>
-
-            <div className="inline-flex items-center gap-2 rounded-full border border-slate-800/70 bg-slate-950/50 px-4 py-2 text-xs uppercase tracking-[0.16em] text-slate-400">
-              <Mic className={`h-4 w-4 ${spoken ? "text-emerald-300" : "text-amber-300"}`} />
-              {spoken ? "Voice Initialized" : "Click Anywhere For Welcome"}
-            </div>
-          </div>
         </div>
 
         {/* ROBOT */}
@@ -170,7 +120,7 @@ export default function RobotWelcome() {
               </div>
             </div>
 
-            {/* MODEL CONTAINER */}
+            {/* ROBOT MODEL */}
             <div className="relative h-[540px] w-full overflow-hidden rounded-[1.5rem] border border-slate-800/70 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.15),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.14),transparent_35%),rgba(2,6,23,0.95)]">
               {!mounted ? (
                 <div className="flex h-full w-full flex-col items-center justify-center gap-4 text-slate-400">
@@ -185,49 +135,57 @@ export default function RobotWelcome() {
                     auto-rotate
                     camera-controls
                     interaction-prompt="none"
-                    style={{ width: "100%", height: "100%" }}
+                    style={{ width: "80%", height: "80%" }}
                   />
                 </div>
               )}
 
-              {/* TOP LEFT CHIP */}
               <div className="pointer-events-none absolute left-4 top-4 rounded-full border border-slate-700/70 bg-slate-950/60 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-slate-400">
                 AI unit active
               </div>
 
-              {/* BOTTOM RIGHT CHIP */}
               <div className="pointer-events-none absolute bottom-4 right-4 rounded-full border border-fuchsia-500/20 bg-fuchsia-500/10 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-fuchsia-300">
                 auto rotate enabled
               </div>
 
-              {/* SPEAKING OVERLAY */}
-              <AnimatePresence>
-                {isSpeaking && (
-                  <>
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.08),transparent_45%)]"
-                    />
-
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2"
-                    >
-                      <div className="flex items-center gap-2 rounded-full border border-sky-500/20 bg-slate-950/70 px-4 py-2 text-xs uppercase tracking-[0.16em] text-sky-300">
-                        <Mic className="h-4 w-4 animate-pulse" />
-                        Voice Active
-                      </div>
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
+              {isSpeaking && (
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.08),transparent_45%)]" />
+              )}
             </div>
           </div>
         </motion.div>
+
+        {/* BUTTON */}
+        <div className="mt-6 flex justify-center">
+          <button
+            type="button"
+            onClick={speakWelcome}
+            className="group inline-flex cursor-pointer items-center gap-3 rounded-full border border-sky-500/30 bg-slate-950/70 px-6 py-3 text-sm font-semibold text-sky-300 shadow-soft-glow transition hover:border-sky-400 hover:text-white"
+          >
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-500/20 text-sky-300 transition group-hover:bg-sky-500 group-hover:text-white">
+              <Volume2 className="h-4 w-4" />
+            </span>
+            Start AI Welcome
+          </button>
+        </div>
+
+        {/* BUILDQUEST BOX */}
+        <div className="mt-6 flex justify-center">
+          <div className="inline-flex items-center gap-3 rounded-2xl border border-slate-800/70 bg-slate-950/60 px-5 py-3 shadow-soft-glow">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-r from-sky-500 via-blue-500 to-fuchsia-500 text-white shadow-soft-glow">
+              <Trophy className="h-5 w-5" />
+            </div>
+
+            <div className="text-left">
+              <div className="text-[10px] uppercase tracking-[0.18em] text-slate-500">
+                Featured Arena
+              </div>
+              <div className="text-sm font-semibold text-slate-100">
+                BuildQuest
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

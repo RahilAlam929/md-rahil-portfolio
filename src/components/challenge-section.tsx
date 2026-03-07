@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Brain,
   Code2,
@@ -14,10 +15,12 @@ import {
   BadgeCheck,
   CalendarDays,
   Stars,
+  X,
 } from "lucide-react";
 
 export default function ChallengeTypes() {
   const [tab, setTab] = useState<"hackathon" | "ideathon">("hackathon");
+  const [timelineOpen, setTimelineOpen] = useState(false);
 
   return (
     <section className="relative overflow-hidden section-shell px-5 py-10 md:px-10 lg:px-12">
@@ -25,7 +28,7 @@ export default function ChallengeTypes() {
       <div className="pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full bg-fuchsia-500/10 blur-3xl" />
 
       <div className="relative mx-auto w-full max-w-6xl">
-        {/* Hero Header */}
+        {/* Header */}
         <div className="mb-10 rounded-[28px] border border-slate-800/70 bg-slate-950/55 p-6 shadow-[0_0_0_1px_rgba(15,23,42,0.7),0_20px_60px_rgba(2,6,23,0.5)] md:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
@@ -77,6 +80,34 @@ export default function ChallengeTypes() {
           </div>
         </div>
 
+        {/* Timeline small box */}
+        <div className="mb-8 flex justify-center">
+          <button
+            type="button"
+            onClick={() => setTimelineOpen(true)}
+            className="w-full max-w-xl cursor-pointer rounded-3xl border border-slate-800/70 bg-slate-950/55 p-5 text-left transition hover:border-sky-500/40 hover:bg-slate-950/70"
+          >
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <div className="text-xs uppercase tracking-[0.18em] text-slate-500">
+                  Challenge Timeline
+                </div>
+                <div className="mt-1 text-sm font-semibold text-slate-100">
+                  BuildQuest 1.0 2026 • March 7 → March 18
+                </div>
+                <div className="mt-1 text-xs text-slate-400">
+                  Click to view full schedule
+                </div>
+              </div>
+
+              <div className="inline-flex items-center gap-2 rounded-full border border-fuchsia-500/20 bg-fuchsia-500/10 px-4 py-2 text-xs uppercase tracking-[0.16em] text-fuchsia-300">
+                <CalendarDays className="h-4 w-4" />
+                12 Days
+              </div>
+            </div>
+          </button>
+        </div>
+
         {/* Tabs */}
         <div className="mb-8 flex flex-wrap gap-3">
           <button
@@ -103,71 +134,6 @@ export default function ChallengeTypes() {
             Ideathon
           </button>
         </div>
-         {/* Time line*/}
-<div className="mb-8 rounded-3xl border border-slate-800/70 bg-slate-950/55 p-5">
-  <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-    <div>
-      <div className="inline-flex items-center gap-2 rounded-full border border-fuchsia-500/20 bg-fuchsia-500/10 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-fuchsia-300">
-        Timeline
-      </div>
-
-      <h3 className="mt-3 text-lg font-semibold text-slate-100">
-        BuildQuest 1.0 2026 Schedule
-      </h3>
-
-      <p className="mt-2 text-sm text-slate-400">
-        Challenge runs from <span className="text-slate-200">7 March 2026</span> to{" "}
-        <span className="text-slate-200">18 March 2026</span>.
-      </p>
-    </div>
-
-    <div className="rounded-2xl border border-sky-500/20 bg-sky-500/5 px-4 py-3 text-sm text-sky-300">
-      12-Day Challenge Window
-    </div>
-  </div>
-
-  <div className="mt-6 grid gap-4 md:grid-cols-4">
-    <div className="rounded-2xl border border-slate-800/70 bg-slate-950/45 p-4">
-      <div className="text-xs uppercase tracking-[0.16em] text-slate-500">
-        Phase 01
-      </div>
-      <div className="mt-2 text-sm font-semibold text-slate-100">
-        Registration Opens
-      </div>
-      <div className="mt-1 text-sm text-slate-400">7 March 2026</div>
-    </div>
-
-    <div className="rounded-2xl border border-slate-800/70 bg-slate-950/45 p-4">
-      <div className="text-xs uppercase tracking-[0.16em] text-slate-500">
-        Phase 02
-      </div>
-      <div className="mt-2 text-sm font-semibold text-slate-100">
-        Build / Ideate Period
-      </div>
-      <div className="mt-1 text-sm text-slate-400">8–16 March 2026</div>
-    </div>
-
-    <div className="rounded-2xl border border-slate-800/70 bg-slate-950/45 p-4">
-      <div className="text-xs uppercase tracking-[0.16em] text-slate-500">
-        Phase 03
-      </div>
-      <div className="mt-2 text-sm font-semibold text-slate-100">
-        Final Submission
-      </div>
-      <div className="mt-1 text-sm text-slate-400">17 March 2026</div>
-    </div>
-
-    <div className="rounded-2xl border border-slate-800/70 bg-slate-950/45 p-4">
-      <div className="text-xs uppercase tracking-[0.16em] text-slate-500">
-        Phase 04
-      </div>
-      <div className="mt-2 text-sm font-semibold text-slate-100">
-        Result / Winner Reveal
-      </div>
-      <div className="mt-1 text-sm text-slate-400">18 March 2026</div>
-    </div>
-  </div>
-</div>
 
         {/* Hackathon */}
         {tab === "hackathon" && (
@@ -419,6 +385,98 @@ export default function ChallengeTypes() {
           </div>
         )}
       </div>
+
+      {/* Timeline Modal */}
+      <AnimatePresence>
+        {timelineOpen && (
+          <motion.div
+            className="fixed inset-0 z-[999] flex items-center justify-center bg-black/70 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setTimelineOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.94, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.94, opacity: 0 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-2xl rounded-3xl border border-slate-800/70 bg-slate-950/95 p-6 shadow-[0_0_0_1px_rgba(15,23,42,0.7),0_20px_60px_rgba(2,6,23,0.55)]"
+            >
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <div className="text-xs uppercase tracking-[0.18em] text-slate-500">
+                    Full Schedule
+                  </div>
+                  <h3 className="mt-2 text-xl font-semibold text-sky-300">
+                    BuildQuest 1.0 Timeline
+                  </h3>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setTimelineOpen(false)}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-700 bg-slate-900/50 text-slate-300 transition hover:border-sky-400 hover:text-sky-300"
+                  aria-label="Close timeline"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="mt-6 space-y-4">
+                <div className="rounded-2xl border border-slate-800/70 bg-slate-950/50 p-4">
+                  <div className="text-xs uppercase tracking-[0.16em] text-slate-500">
+                    Phase 01
+                  </div>
+                  <div className="mt-2 text-sm font-semibold text-slate-100">
+                    Registration Opens
+                  </div>
+                  <div className="mt-1 text-sm text-slate-400">
+                    March 7, 2026
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-slate-800/70 bg-slate-950/50 p-4">
+                  <div className="text-xs uppercase tracking-[0.16em] text-slate-500">
+                    Phase 02
+                  </div>
+                  <div className="mt-2 text-sm font-semibold text-slate-100">
+                    Build / Ideate Period
+                  </div>
+                  <div className="mt-1 text-sm text-slate-400">
+                    March 8 – March 16, 2026
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-slate-800/70 bg-slate-950/50 p-4">
+                  <div className="text-xs uppercase tracking-[0.16em] text-slate-500">
+                    Phase 03
+                  </div>
+                  <div className="mt-2 text-sm font-semibold text-slate-100">
+                    Final Submission
+                  </div>
+                  <div className="mt-1 text-sm text-slate-400">
+                    March 17, 2026
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-slate-800/70 bg-slate-950/50 p-4">
+                  <div className="text-xs uppercase tracking-[0.16em] text-slate-500">
+                    Phase 04
+                  </div>
+                  <div className="mt-2 text-sm font-semibold text-slate-100">
+                    Winner Announcement
+                  </div>
+                  <div className="mt-1 text-sm text-slate-400">
+                    March 18, 2026
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
