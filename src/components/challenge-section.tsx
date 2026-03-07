@@ -103,6 +103,71 @@ export default function ChallengeTypes() {
             Ideathon
           </button>
         </div>
+         {/* Time line*/}
+<div className="mb-8 rounded-3xl border border-slate-800/70 bg-slate-950/55 p-5">
+  <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div>
+      <div className="inline-flex items-center gap-2 rounded-full border border-fuchsia-500/20 bg-fuchsia-500/10 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-fuchsia-300">
+        Timeline
+      </div>
+
+      <h3 className="mt-3 text-lg font-semibold text-slate-100">
+        BuildQuest 1.0 2026 Schedule
+      </h3>
+
+      <p className="mt-2 text-sm text-slate-400">
+        Challenge runs from <span className="text-slate-200">7 March 2026</span> to{" "}
+        <span className="text-slate-200">18 March 2026</span>.
+      </p>
+    </div>
+
+    <div className="rounded-2xl border border-sky-500/20 bg-sky-500/5 px-4 py-3 text-sm text-sky-300">
+      12-Day Challenge Window
+    </div>
+  </div>
+
+  <div className="mt-6 grid gap-4 md:grid-cols-4">
+    <div className="rounded-2xl border border-slate-800/70 bg-slate-950/45 p-4">
+      <div className="text-xs uppercase tracking-[0.16em] text-slate-500">
+        Phase 01
+      </div>
+      <div className="mt-2 text-sm font-semibold text-slate-100">
+        Registration Opens
+      </div>
+      <div className="mt-1 text-sm text-slate-400">7 March 2026</div>
+    </div>
+
+    <div className="rounded-2xl border border-slate-800/70 bg-slate-950/45 p-4">
+      <div className="text-xs uppercase tracking-[0.16em] text-slate-500">
+        Phase 02
+      </div>
+      <div className="mt-2 text-sm font-semibold text-slate-100">
+        Build / Ideate Period
+      </div>
+      <div className="mt-1 text-sm text-slate-400">8–16 March 2026</div>
+    </div>
+
+    <div className="rounded-2xl border border-slate-800/70 bg-slate-950/45 p-4">
+      <div className="text-xs uppercase tracking-[0.16em] text-slate-500">
+        Phase 03
+      </div>
+      <div className="mt-2 text-sm font-semibold text-slate-100">
+        Final Submission
+      </div>
+      <div className="mt-1 text-sm text-slate-400">17 March 2026</div>
+    </div>
+
+    <div className="rounded-2xl border border-slate-800/70 bg-slate-950/45 p-4">
+      <div className="text-xs uppercase tracking-[0.16em] text-slate-500">
+        Phase 04
+      </div>
+      <div className="mt-2 text-sm font-semibold text-slate-100">
+        Result / Winner Reveal
+      </div>
+      <div className="mt-1 text-sm text-slate-400">18 March 2026</div>
+    </div>
+  </div>
+</div>
 
         {/* Hackathon */}
         {tab === "hackathon" && (

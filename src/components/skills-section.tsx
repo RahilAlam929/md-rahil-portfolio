@@ -11,9 +11,11 @@ const groups: SkillGroup[] = [
   {
     label: "Frontend",
     skills: [
-      { name: "React", level: 92 },
-      { name: "Next.js", level: 90 },
-      { name: "Tailwind CSS", level: 88 },
+      { name: "JavaScript", level: 100 },
+      { name: "React", level: 100 },
+      { name: "Next.js", level: 100 },
+      { name: "Tailwind CSS", level: 100 },
+      { name: " TypeScript", level: 100 },
     ],
   },
   {
@@ -22,13 +24,13 @@ const groups: SkillGroup[] = [
       { name: "Node.js", level: 90 },
       { name: "Express", level: 86 },
       { name: "MongoDB", level: 84 },
-    ],
+    ]
   },
   {
     label: "AI & Robotics",
     skills: [
-      { name: "C++", level: 90 },
-      { name: "Machine Learning", level: 84 },
+      { name: "C++", level: 70 },
+      { name: "Machine Learning", level: 65 },
       { name: "Robotics Systems", level: 82 },
     ],
   },

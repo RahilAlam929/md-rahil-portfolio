@@ -27,7 +27,8 @@ const defaultEvents: EventItem[] = [
     title: "BuildQuest 1.0 2026 — Hackathon + Ideathon",
     date: "Starting Soon",
     location: "Online",
-    timeline: "1 Week Challenge Timeline",
+    timeline: "2  Week Challenge Timeline"
+            ,
     description:
       "A premium innovation challenge where participants can choose Hackathon or Ideathon tracks, solve real-world problems, and compete for exciting prizes and winner spotlight.",
     link: "/#challenge",
