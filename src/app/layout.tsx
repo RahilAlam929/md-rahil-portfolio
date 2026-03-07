@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
 });
 
 const geistMono = Geist_Mono({
@@ -14,48 +14,28 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MD Rahil | Full Stack Web Developer & Robotics Enthusiast",
-  description:
-    "Portfolio of MD Rahil - Full Stack Web Developer & Robotics Enthusiast. I build intelligent digital systems by combining modern web technologies with robotics and AI.",
-  metadataBase: new URL("https://md-rahil-portfolio.example.com"),
-  openGraph: {
-    title: "MD Rahil | Full Stack Web Developer & Robotics Enthusiast",
-    description:
-      "Explore premium projects blending full stack development, robotics, and AI to create impactful real-world solutions.",
-    type: "website",
-    url: "https://md-rahil-portfolio.example.com",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "MD Rahil | Full Stack Web Developer & Robotics Enthusiast",
-    description:
-      "Intelligent digital systems built with modern full stack tools, robotics, and AI.",
-  },
-  keywords: [
-    "MD Rahil",
-    "Full Stack Developer",
-    "Next.js Portfolio",
-    "Robotics Enthusiast",
-    "AI Builder",
-    "React",
-    "Node.js",
-    "MongoDB",
-  ],
+  title: "MD Rahil | Portfolio",
+  description: "Full Stack Developer & Robotics Enthusiast",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-transparent text-slate-100`}
+        className={`${geistSans.variable} ${geistMono.variable} bg-[#020202] text-white`}
       >
-        <div className="grid-bg" />
-        <div className="noise-overlay" />
         {children}
+
+        {/* 3D Robot Viewer Script */}
+        <Script
+          type="module"
+          src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

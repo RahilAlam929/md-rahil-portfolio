@@ -1,112 +1,125 @@
 "use client";
 
 import { motion } from "framer-motion";
+import {
+  Activity,
+  Sparkles,
+  Clock3,
+  TerminalSquare,
+  Rocket,
+} from "lucide-react";
 
 type UpdateItem = {
   title: string;
-  timestamp: string;
-  summary: string;
-  label: string;
+  status?: "completed" | "in-progress" | "planned";
+  description?: string;
+  date?: string;
 };
 
-const updates: UpdateItem[] = [
-  {
-    title: "Shipping a faster, cleaner UI system",
-    timestamp: "2026 · Recently",
-    summary:
-      "Refined motion timings, improved spacing, and tuned glass layers for a more premium, Silicon Valley feel.",
-    label: "UI",
-  },
-  {
-    title: "Robotics dashboard experiments",
-    timestamp: "2026 · Ongoing",
-    summary:
-      "Exploring real-time telemetry cards, alert surfaces, and operator-centric flows for autonomous systems.",
-    label: "Robotics",
-  },
-  {
-    title: "AI summaries for project impact",
-    timestamp: "2026 · In progress",
-    summary:
-      "Designing compact project narratives tailored to different audiences: recruiters, builders, and product teams.",
-    label: "AI",
-  },
-];
+type UpdatesSectionProps = {
+  updates?: UpdateItem[];
+};
 
-export default function UpdatesSection() {
+export default function UpdatesSection({
+  updates = [],
+}: UpdatesSectionProps) {
+  const hasUpdates = updates.length > 0;
+
   return (
     <section
       id="updates"
-      className="section-shell relative overflow-hidden px-5 py-7 sm:px-8 sm:py-9 md:px-10 md:py-10 lg:px-12"
+      className="section-shell relative overflow-hidden px-5 py-8 sm:px-8 sm:py-10 md:px-10 md:py-12 lg:px-12 lg:py-14"
     >
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-sky-500/10 via-transparent to-fuchsia-500/10 opacity-70 blur-3xl" />
+      <div className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-sky-500/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-24 -bottom-24 h-72 w-72 rounded-full bg-fuchsia-500/10 blur-3xl" />
 
-      <div className="relative space-y-6">
-        <div className="flex flex-col justify-between gap-3 md:flex-row md:items-end">
-          <div>
-            <h2 className="text-xs font-semibold uppercase tracking-[0.25em] text-sky-300">
-              Updates
-            </h2>
-            <p className="mt-2 text-xl font-semibold text-slate-50 md:text-2xl">
-              What I’m building and improving.
-            </p>
+      <div className="relative mx-auto w-full max-w-6xl">
+        <div className="mb-6">
+          <div className="inline-flex items-center gap-2 rounded-full border border-sky-500/20 bg-slate-950/50 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-sky-300/80">
+            <Sparkles className="h-4 w-4" />
+            Build Log
           </div>
-          <p className="max-w-md text-xs text-slate-400 md:text-[13px]">
-            Short release notes from my lab — product polish, robotics systems,
-            and applied AI experiments.
+
+          <h2 className="mt-4 text-xl font-semibold text-sky-300">
+            Build Updates
+          </h2>
+
+          <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-400">
+            A space to share what I’m building, what I’ve completed, and what’s
+            coming next.
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
-          {updates.map((item, index) => (
-            <motion.article
-              key={item.title}
-              className="group relative overflow-hidden rounded-2xl border border-slate-700/70 bg-slate-950/70 p-4 shadow-soft-glow"
-              initial={{ opacity: 0, y: 22 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.45 }}
-              transition={{
-                duration: 0.65,
-                delay: index * 0.06,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              whileHover={{
-                y: -4,
-                transition: { type: "spring", stiffness: 160, damping: 18 },
-              }}
-            >
-              <div className="pointer-events-none absolute -inset-x-10 -top-16 h-32 bg-gradient-to-b from-fuchsia-500/20 via-transparent to-transparent opacity-0 blur-3xl transition-opacity duration-300 group-hover:opacity-100" />
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          className="relative overflow-hidden rounded-3xl border border-slate-800/70 bg-slate-950/45 p-6"
+        >
+          <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.08),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.08),transparent_30%)]" />
 
-              <div className="relative space-y-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="text-[10px] font-mono uppercase tracking-[0.18em] text-slate-400">
-                      {item.label}
-                    </p>
-                    <h3 className="mt-1 text-sm font-semibold text-slate-50">
-                      {item.title}
-                    </h3>
-                  </div>
-                  <span className="badge-pill px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-slate-200">
-                    {item.timestamp}
-                  </span>
+          {!hasUpdates ? (
+            <div className="relative text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-800/70 bg-slate-950/60 shadow-soft-glow">
+                <Activity className="h-8 w-8 text-sky-300" />
+              </div>
+
+              <h3 className="mt-5 text-xl font-semibold text-slate-100">
+                No updates yet
+              </h3>
+
+              <p className="mt-3 mx-auto max-w-md text-sm leading-7 text-slate-400">
+                Project progress, current work, and upcoming launches will appear
+                here soon.
+              </p>
+
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                <div className="inline-flex items-center gap-2 rounded-full border border-slate-800/70 bg-slate-950/50 px-4 py-2 text-xs uppercase tracking-[0.16em] text-slate-400">
+                  <Clock3 className="h-4 w-4 text-amber-300" />
+                  Work in progress
                 </div>
 
-                <p className="text-xs leading-relaxed text-slate-300/85 md:text-[13px]">
-                  {item.summary}
-                </p>
+                <div className="inline-flex items-center gap-2 rounded-full border border-slate-800/70 bg-slate-950/50 px-4 py-2 text-xs uppercase tracking-[0.16em] text-slate-400">
+                  <Rocket className="h-4 w-4 text-fuchsia-300" />
+                  Upcoming launches
+                </div>
 
-                <div className="pt-1">
-                  <span className="chip-soft inline-flex px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-fuchsia-200/90">
-                    Read more soon
-                  </span>
+                <div className="inline-flex items-center gap-2 rounded-full border border-slate-800/70 bg-slate-950/50 px-4 py-2 text-xs uppercase tracking-[0.16em] text-slate-400">
+                  <TerminalSquare className="h-4 w-4 text-sky-300" />
+                  Dev updates
                 </div>
               </div>
-            </motion.article>
-          ))}
-        </div>
+            </div>
+          ) : (
+            <div className="relative space-y-4">
+              {updates.map((item, index) => (
+                <div
+                  key={`${item.title}-${index}`}
+                  className="rounded-2xl border border-slate-800/70 bg-slate-950/50 p-4"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h3 className="text-sm font-semibold text-slate-100">
+                      {item.title}
+                    </h3>
+                    {item.date ? (
+                      <span className="text-xs uppercase tracking-[0.16em] text-slate-500">
+                        {item.date}
+                      </span>
+                    ) : null}
+                  </div>
+
+                  {item.description ? (
+                    <p className="mt-2 text-sm leading-7 text-slate-400">
+                      {item.description}
+                    </p>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          )}
+        </motion.div>
       </div>
     </section>
   );
 }
-
